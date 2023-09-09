@@ -11,7 +11,12 @@ namespace JonathonOH.UnityDataStorage
         /// No type guarantee
         /// </summary>
         bool Contains(string key);
-        
+
         void Save();
+
+        /// <summary>
+        /// Is there any persisted data at all?
+        /// </summary>
+        bool SavedDataExists();
     }
 }

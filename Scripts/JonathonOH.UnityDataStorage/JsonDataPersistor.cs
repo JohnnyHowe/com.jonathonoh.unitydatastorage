@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace JonathonOH.UnityDataStorage
     {
         private const string fileName = "JonathonOH.UnityStorage.Data.json";
         public string filePath;
+        private bool savedDataExists;
 
         // key, json data
         private Dictionary<string, string> data;
@@ -22,7 +24,7 @@ namespace JonathonOH.UnityDataStorage
             // Correct place to save persistent data
             filePath = Application.persistentDataPath + Path.AltDirectorySeparatorChar + defaultFileName;
 #endif
-            data = GetSavedData();
+            LoadSavedData();
         }
 
         public bool Contains(string key)
@@ -44,26 +46,59 @@ namespace JonathonOH.UnityDataStorage
 
         public async void Save()
         {
-            StreamWriter writer = new StreamWriter(filePath);
-            await writer.WriteAsync(JsonConvert.SerializeObject(data));
-            writer.Close();
+            await Save(JsonConvert.SerializeObject(data));
         }
 
         /// <summary>
-        /// Returns new dictionary if no data is saved
+        /// sets data to new dictionary if no data is saved
+        /// sets savedDataExists if a file with json exists
         /// </summary>
         /// <returns></returns>
-        private Dictionary<string, string> GetSavedData()
+        private void LoadSavedData()
         {
-            if (!File.Exists(filePath)) return new Dictionary<string, string>();
+            savedDataExists = false;
+            if (!File.Exists(filePath))
+            {
+                data = new Dictionary<string, string>();
+                return;
+            }
 
             StreamReader reader = new StreamReader(filePath);
             string rawContents = reader.ReadToEnd();
             reader.Close();
             Dictionary<string, string> readData = JsonConvert.DeserializeObject<Dictionary<string, string>>(rawContents);
-            if (readData != null) return readData;
+            if (readData != null)
+            {
+                savedDataExists = true;
+                data = readData;
+            }
 
-            return new Dictionary<string, string>();
+            data = new Dictionary<string, string>();
+        }
+
+        public bool SavedDataExists()
+        {
+            return savedDataExists;
+        }
+
+        internal void DeleteSaveFile()
+        {
+            File.Delete(filePath);
+        }
+
+        /// <summary>
+        /// Removes all save data but keeps a json file with no data
+        /// </summary>
+        internal async void ClearSaveData()
+        {
+            await Save("{}");
+        }
+
+        private async Task Save(string jsonString)
+        {
+            StreamWriter writer = new StreamWriter(filePath);
+            await writer.WriteAsync(jsonString);
+            writer.Close();
         }
     }
 }
