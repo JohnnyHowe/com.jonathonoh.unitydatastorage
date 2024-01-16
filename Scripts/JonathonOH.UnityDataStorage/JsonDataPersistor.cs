@@ -29,7 +29,7 @@ namespace JonathonOH.UnityDataStorage
 
         public bool Contains(string key)
         {
-            throw new System.NotImplementedException();
+            return data.ContainsKey(key);
         }
 
         public void Set<T>(string key, T value, bool saveNow = true)
@@ -67,23 +67,23 @@ namespace JonathonOH.UnityDataStorage
             string rawContents = reader.ReadToEnd();
             reader.Close();
             Dictionary<string, string> readData = JsonConvert.DeserializeObject<Dictionary<string, string>>(rawContents);
+
             if (readData != null)
             {
                 savedDataExists = true;
                 data = readData;
             }
-
-            data = new Dictionary<string, string>();
+            else
+            {
+                data = new Dictionary<string, string>();
+            }
         }
 
-        public bool SavedDataExists()
-        {
-            return savedDataExists;
-        }
-
-        internal void DeleteSaveFile()
+        public void DeleteSavedData()
         {
             File.Delete(filePath);
+            savedDataExists = false;
+            data = new Dictionary<string, string>();
         }
 
         /// <summary>

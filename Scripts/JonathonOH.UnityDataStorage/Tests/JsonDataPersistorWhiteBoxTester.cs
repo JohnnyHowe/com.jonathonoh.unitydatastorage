@@ -11,7 +11,7 @@ namespace JonathonOH.UnityDataStorage.Tests
     public class JsonDataPersistorWhiteBoxTester
     {
         [Test]
-        public async void TestFileCreationOnSave()
+        public async Task TestFileCreationOnSave()
         {
             JsonDataPersistor persistor = new JsonDataPersistor();
             File.Delete(persistor.filePath);

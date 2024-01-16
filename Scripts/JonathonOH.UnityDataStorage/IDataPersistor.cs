@@ -14,9 +14,6 @@ namespace JonathonOH.UnityDataStorage
 
         void Save();
 
-        /// <summary>
-        /// Is there any persisted data at all?
-        /// </summary>
-        bool SavedDataExists();
+        void DeleteSavedData();
     }
 }
